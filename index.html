@@ -137,9 +137,6 @@ summary{cursor:pointer;color:var(--muted)}
 .swap-list button{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 10px}
 .warn{color:var(--alert);font-size:.88rem;margin-top:6px}
 .linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;padding:0;font-size:.85rem}
-.connect{background:var(--alert-soft);border-radius:10px;padding:12px 14px;margin-bottom:18px}
-.connect-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-.connect input{flex:1;min-width:160px;font-family:inherit;font-size:1rem;padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
 [hidden]{display:none !important}
 footer{margin-top:32px;font-size:.85rem;color:var(--muted)}
 footer .err{color:var(--alert)}
@@ -233,7 +230,6 @@ footer .err{color:var(--alert)}
   function todayKey(){ var d = new Date(nowShifted()); return keyOf(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
   function dow(k){ return new Date(msOf(k)).getUTCDay(); }
   function weekIdx(k){ return Math.floor((msOf(k) - SEM_START) / (7*DAY)); }
-  function clampW(w){ return Math.max(0, Math.min(WEEKS-1, w)); }
   function weekDays(w){ var a=[]; for (var i=0;i<7;i++) a.push(keyOf(SEM_START + (w*7+i)*DAY)); return a; }
   function addDays(k,n){ return keyOf(msOf(k) + n*DAY); }
   function fmtDate(k){ var d=new Date(msOf(k)); return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()]; }
@@ -395,16 +391,16 @@ footer .err{color:var(--alert)}
     if (needBike > bikeAvail) out.push(["alert", "المتبقي في الخطة " + (bikeAvail ? ar(bikeAvail, "خرجة واحدة", "خرجتان", "خرجات", "خرجة") : "لا خرجات") + "، والمطلوب " + ar(needBike, "خرجة واحدة", "خرجتان", "خرجات", "خرجة") + " لبلوغ ثلاث خرجات. بدّل يومًا داخليًا بيوم دراجة من لوحة اليوم."]);
 
     if (st.sem) {
-    var needStudy = Math.max(0, 3 - st.study);
-    var studyAvail = rest.filter(function(d){ return d <= ds[5] && planOf(d).study && (days[d]||{}).study !== false; }).length;
-    if (needStudy > studyAvail) out.push(["alert", "المطلوب " + ar(needStudy, "جلسة دراسة واحدة", "جلستا دراسة", "جلسات دراسة", "جلسة") + "، والمتبقي في الخطة قبل مساء السبت " + (studyAvail ? ar(studyAvail, "جلسة واحدة", "جلستان", "جلسات", "جلسة") : "لا شيء") + ". إن كنت درست في يوم سابق فسجّله من شبكة الأيام، وإلا فسجّل جلسة إضافية في يوم غير مجدول."]);
+      var needStudy = Math.max(0, 3 - st.study);
+      var studyAvail = rest.filter(function(d){ return d <= ds[5] && planOf(d).study && (days[d]||{}).study !== false; }).length;
+      if (needStudy > studyAvail) out.push(["alert", "المطلوب " + ar(needStudy, "جلسة دراسة واحدة", "جلستا دراسة", "جلسات دراسة", "جلسة") + "، والمتبقي في الخطة قبل مساء السبت " + (studyAvail ? ar(studyAvail, "جلسة واحدة", "جلستان", "جلسات", "جلسة") : "لا شيء") + ". إن كنت درست في يوم سابق فسجّله من شبكة الأيام، وإلا فسجّل جلسة إضافية في يوم غير مجدول."]);
 
-    var last = null;
-    Object.keys(days).forEach(function(d){ if (days[d].study === true && d <= today && (!last || d > last)) last = d; });
-    if (last) {
-      var gap = Math.round((msOf(today) - msOf(last)) / DAY);
-      if (gap > 3) out.push(["alert", "مضت " + ar(gap, "يوم", "يومان", "أيام", "يومًا") + " منذ آخر جلسة دراسة. القاعدة ألّا تزيد الفجوة على ثلاثة أيام."]);
-    }
+      var last = null;
+      Object.keys(days).forEach(function(d){ if (days[d].study === true && d <= today && (!last || d > last)) last = d; });
+      if (last) {
+        var gap = Math.round((msOf(today) - msOf(last)) / DAY);
+        if (gap > 3) out.push(["alert", "مضت " + ar(gap, "يوم", "يومان", "أيام", "يومًا") + " منذ آخر جلسة دراسة. القاعدة ألّا تزيد الفجوة على ثلاثة أيام."]);
+      }
     }
     var sm = sleepMin(today);
     if (sm !== null && sm < 360) out.push(["alert", "نومك الليلة الماضية " + fmtDur(sm) + "، وهو أقل من الهدف (6 إلى 7 ساعات)."]);
@@ -480,8 +476,8 @@ footer .err{color:var(--alert)}
   function chip(kind, val){ return '<span class="chip ' + kind + (val===true ? " done" : val===false ? " miss" : "") + '"></span>'; }
 
   function renderWeek(){
-    var today = todayKey(), ds = weekDays(viewWeek), order = ds; // الاثنين أولًا
-    document.getElementById("week").innerHTML = order.map(function(k){
+    var today = todayKey(), ds = weekDays(viewWeek);
+    document.getElementById("week").innerHTML = ds.map(function(k){
       var p = planOf(k), r = days[k] || {};
       var chips = "";
       if (p.study || r.study != null) chips += chip("study", r.study);
