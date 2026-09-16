@@ -72,6 +72,9 @@ section{margin-top:28px}
 .seg.current .bar{box-shadow:0 0 0 2px var(--ink)}
 .seg.viewing .num{font-weight:700;color:var(--ink)}
 .seg .num{font-family:var(--kufi);font-size:.85rem;color:var(--muted)}
+.wnav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.wnav button{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 12px;font-size:.9rem}
+.wnav button:disabled{opacity:.4;cursor:default}
 .ribbon-legend{font-size:.8rem;color:var(--muted);margin-top:6px}
 
 /* Meters */
@@ -162,9 +165,10 @@ footer .err{color:var(--alert)}
       </div>
       <p class="muted" id="nowLine"></p>
     </div>
+    <div class="wnav" id="wnav"></div>
     <div class="deadline" id="deadline"></div>
     <nav class="ribbon" id="ribbon" aria-label="أسابيع الفصل"></nav>
-    <p class="ribbon-legend">امتلاء كل أسبوع يعكس نسبة ما أنجزتَه من الدراسة والدراجة والرياضة الداخلية. اضغط على أي أسبوع لعرضه.</p>
+    <p class="ribbon-legend" id="ribbonNote"></p>
   </header>
 
   <section aria-labelledby="mTitle">
@@ -177,7 +181,7 @@ footer .err{color:var(--alert)}
     <h2 id="wTitle">أيام الأسبوع</h2>
     <div class="week" id="week"></div>
     <div class="legend">
-      <span><i style="background:var(--study)"></i>دراسة</span>
+      <span id="legendStudy"><i style="background:var(--study)"></i>دراسة</span>
       <span><i style="background:var(--bike)"></i>دراجة</span>
       <span><i style="background:var(--indoor)"></i>رياضة داخلية</span>
       <span>المعبّأ: تم، والمتقطع: لم يتم، والفارغ: لم يُسجَّل</span>
@@ -199,7 +203,7 @@ footer .err{color:var(--alert)}
   "use strict";
   // ================= الإعداد =================
   // الصق هنا رابط خدمة Google المنتهي بكلمة exec بين علامتي التنصيص:
-  var API_URL = 'https://script.google.com/macros/s/AKfycby_kKpgaeBPvkx_a4a39tRCBtmETD6WdPU4a9FWswSBbmWO49hiX4wTihU5EMcgDYd7tw/exec';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbxjTnfMjlkDsi_sf0b3SA8B7-mX-rH6s38tmnfkCD6cD9wWj1QVgimo8z068t41s_dOAw/exec';
   // ==========================================
   var OFFSET = 3 * 3600000;               // توقيت الرياض (UTC+3 بلا توقيت صيفي)
   var DAY = 86400000;
@@ -243,10 +247,12 @@ footer .err{color:var(--alert)}
     return n + " " + many;
   }
   function rec(k){ if(!days[k]) days[k] = {}; return days[k]; }
+  function inSemW(w){ return w >= 0 && w < WEEKS; }
+  function inSem(k){ return inSemW(weekIdx(k)); }
   function planOf(k){
-    var t = TEMPLATE[dow(k)], r = days[k] || {};
+    var t = TEMPLATE[dow(k)], r = days[k] || {}, sem = inSem(k);
     var act = r.plan || t.act;
-    return { study:t.study, act:act, light:!!t.light && act==="indoor", closing:!!t.closing, deadline:!!t.deadline };
+    return { study:t.study && sem, act:act, light:!!t.light && act==="indoor", closing:!!t.closing && sem, deadline:!!t.deadline && sem, sem:sem };
   }
   function sleepMin(k){
     var r = days[k]; if(!r) return null;
@@ -334,8 +340,9 @@ footer .err{color:var(--alert)}
       var sm = sleepMin(k); if (sm !== null) { sleepSum += sm; sleepN++; }
     });
     var sc = Math.min(s,3), bc = Math.min(b,3), ic = Math.min(i,iTarget);
-    return { study:s, bike:b, indoor:i, indoorTarget:iTarget,
-             ratio:(sc+bc+ic)/(3+3+iTarget),
+    var sem = inSemW(w);
+    return { study:s, bike:b, indoor:i, indoorTarget:iTarget, sem:sem,
+             ratio: sem ? (sc+bc+ic)/(3+3+iTarget) : (bc+ic)/(3+iTarget),
              sleepAvg: sleepN ? Math.round(sleepSum/sleepN) : null, sleepN:sleepN };
   }
 
@@ -387,6 +394,7 @@ footer .err{color:var(--alert)}
     var bikeAvail = rest.filter(function(d){ return planOf(d).act==="bike" && (days[d]||{}).bike !== false; }).length;
     if (needBike > bikeAvail) out.push(["alert", "المتبقي في الخطة " + (bikeAvail ? ar(bikeAvail, "خرجة واحدة", "خرجتان", "خرجات", "خرجة") : "لا خرجات") + "، والمطلوب " + ar(needBike, "خرجة واحدة", "خرجتان", "خرجات", "خرجة") + " لبلوغ ثلاث خرجات. بدّل يومًا داخليًا بيوم دراجة من لوحة اليوم."]);
 
+    if (st.sem) {
     var needStudy = Math.max(0, 3 - st.study);
     var studyAvail = rest.filter(function(d){ return d <= ds[5] && planOf(d).study && (days[d]||{}).study !== false; }).length;
     if (needStudy > studyAvail) out.push(["alert", "المطلوب " + ar(needStudy, "جلسة دراسة واحدة", "جلستا دراسة", "جلسات دراسة", "جلسة") + "، والمتبقي في الخطة قبل مساء السبت " + (studyAvail ? ar(studyAvail, "جلسة واحدة", "جلستان", "جلسات", "جلسة") : "لا شيء") + ". إن كنت درست في يوم سابق فسجّله من شبكة الأيام، وإلا فسجّل جلسة إضافية في يوم غير مجدول."]);
@@ -396,6 +404,7 @@ footer .err{color:var(--alert)}
     if (last) {
       var gap = Math.round((msOf(today) - msOf(last)) / DAY);
       if (gap > 3) out.push(["alert", "مضت " + ar(gap, "يوم", "يومان", "أيام", "يومًا") + " منذ آخر جلسة دراسة. القاعدة ألّا تزيد الفجوة على ثلاثة أيام."]);
+    }
     }
     var sm = sleepMin(today);
     if (sm !== null && sm < 360) out.push(["alert", "نومك الليلة الماضية " + fmtDur(sm) + "، وهو أقل من الهدف (6 إلى 7 ساعات)."]);
@@ -409,15 +418,25 @@ footer .err{color:var(--alert)}
 
   function renderHeader(){
     var today = todayKey(), tw = weekIdx(today), w = viewWeek;
-    var ds = weekDays(w);
-    document.getElementById("weekTitle").textContent = "الأسبوع " + (w+1) + " من " + WEEKS;
-    document.getElementById("weekRange").textContent = "من " + DAYNAMES[1] + " " + fmtDate(ds[0]) + " إلى " + DAYNAMES[0] + " " + fmtDate(ds[6]) + " 2026";
+    var ds = weekDays(w), sem = inSemW(w);
+    document.getElementById("weekTitle").textContent = sem ? "الأسبوع " + (w+1) + " من " + WEEKS : "بعد الفصل: الأسبوع " + (w - WEEKS + 1);
+    document.getElementById("weekRange").textContent = "من " + DAYNAMES[1] + " " + fmtDate(ds[0]) + " إلى " + DAYNAMES[0] + " " + fmtDate(ds[6]) + " " + new Date(msOf(ds[6])).getUTCFullYear();
+    var maxW = Math.max(WEEKS - 1, tw);
+    document.getElementById("wnav").innerHTML =
+      '<button data-nav="-1"' + (w <= 0 ? " disabled" : "") + '>الأسبوع السابق</button>' +
+      (w !== tw && tw >= 0 ? '<button data-nav="now">الأسبوع الحالي</button>' : "") +
+      '<button data-nav="1"' + (w >= maxW ? " disabled" : "") + '>الأسبوع التالي</button>';
     var nowL = "اليوم: " + DAYNAMES[dow(today)] + " " + fmtDate(today);
     if (tw < 0) nowL += " (قبل بداية الفصل)";
-    if (tw >= WEEKS) nowL += " (انتهى الفصل)";
+    if (tw >= WEEKS) nowL += " (بعد نهاية الفصل)";
     document.getElementById("nowLine").textContent = nowL;
 
     var dl = document.getElementById("deadline");
+    dl.hidden = !sem;
+    document.getElementById("legendStudy").hidden = !sem;
+    document.getElementById("ribbonNote").textContent = tw >= WEEKS
+      ? "انتهى الفصل الدراسي، وتستمر متابعة الرياضة والنوم أسبوعًا بأسبوع. هذا الشريط لأسابيع الفصل، واضغط على أي أسبوع منها لمراجعته."
+      : "امتلاء كل أسبوع يعكس نسبة ما أنجزتَه من الدراسة والدراجة والرياضة الداخلية. اضغط على أي أسبوع لعرضه.";
     var internal = SEM_START + (w*7 + 5)*DAY + 21*3600000;               // السبت 9 مساءً
     var official = SEM_START + (w*7 + 7)*DAY + (w <= 6 ? 7*60+59 : 8*60+59)*60000; // الاثنين صباحًا بتوقيت الرياض
     var now = nowShifted(), html;
@@ -450,7 +469,7 @@ footer .err{color:var(--alert)}
     var st = weekStats(viewWeek);
     var sl = st.sleepAvg === null ? "—" : fmtDur(st.sleepAvg);
     document.getElementById("meters").innerHTML =
-      '<div class="meter m-study"><p class="label">جلسات الدراسة</p><p class="val">' + st.study + " من 3</p>" + pips(st.study,3) + "</div>" +
+      (st.sem ? '<div class="meter m-study"><p class="label">جلسات الدراسة</p><p class="val">' + st.study + " من 3</p>" + pips(st.study,3) + "</div>" : "") +
       '<div class="meter m-bike"><p class="label">خرجات الدراجة</p><p class="val">' + st.bike + " من 3</p>" + pips(st.bike,3) + "</div>" +
       '<div class="meter m-indoor"><p class="label">الرياضة الداخلية</p><p class="val">' + st.indoor + " من " + st.indoorTarget + "</p>" + pips(st.indoor,st.indoorTarget) + "</div>" +
       '<div class="meter m-sleep"><p class="label">متوسط النوم' + (st.sleepN ? " (" + ar(st.sleepN, "ليلة واحدة", "ليلتان", "ليالٍ", "ليلة") + ")" : "") + '</p><p class="val' + (st.sleepAvg!==null && st.sleepAvg<360 ? " bad" : "") + '">' + sl + '</p><p class="label">الهدف: 6 إلى 7 ساعات</p></div>';
@@ -501,7 +520,7 @@ footer .err{color:var(--alert)}
     if (p.study) {
       var title = p.closing ? "الجلسة الختامية وتسليم الواجبات" : dow(k)===1 ? "جلسة دراسة: قراءة المتطلبات والبدء" : "جلسة دراسة: العمل الأساسي على الواجبات";
       h += '<div class="item study"><div class="item-head"><div><h3>' + title + '</h3><p class="sub">6 مساءً إلى 9 مساءً (3 ساعات)</p></div>' + toggles(k,"study","أنجزت","لم أنجز") + "</div></div>";
-    } else {
+    } else if (p.sem) {
       var ex = r.study === true;
       h += '<div class="item study"><div class="item-head"><div><h3>جلسة دراسة إضافية</h3><p class="sub">غير مجدولة لهذا اليوم. سجّلها إن درست لتُحتسب ضمن الأسبوع.</p></div>' +
            '<div class="toggles"><button class="tg yes" data-k="' + k + '" data-f="study" data-v="' + (ex ? "clear" : "true") + '" aria-pressed="' + ex + '">' + (ex ? "مسجّلة" : "سجّل جلسة") + "</button></div></div></div>";
@@ -535,6 +554,13 @@ footer .err{color:var(--alert)}
       selected = weekIdx(today) === viewWeek ? today : weekDays(viewWeek)[0];
       render(); return;
     }
+    if (t.dataset.nav) {
+      var today2 = todayKey(), tw2 = weekIdx(today2);
+      if (t.dataset.nav === "now") viewWeek = Math.max(0, tw2);
+      else viewWeek = Math.max(0, Math.min(Math.max(WEEKS - 1, tw2), viewWeek + (+t.dataset.nav)));
+      selected = weekIdx(today2) === viewWeek ? today2 : weekDays(viewWeek)[0];
+      render(); return;
+    }
     if (t.dataset.day) { selected = t.dataset.day; render(); return; }
     if (t.dataset.f) {
       var r = rec(t.dataset.k), f = t.dataset.f, v = t.dataset.v;
@@ -560,7 +586,7 @@ footer .err{color:var(--alert)}
   // ---------- التشغيل ----------
   (function init(){
     var today = todayKey();
-    viewWeek = clampW(weekIdx(today));
+    viewWeek = Math.max(0, weekIdx(today));
     selected = weekIdx(today) === viewWeek ? today : weekDays(viewWeek)[0];
     render();
     setInterval(function(){ renderHeader(); }, 60000);
