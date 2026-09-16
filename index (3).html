@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>خطتي الأسبوعية: الدراسة والرياضة والنوم</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="خطتي">
+<meta name="application-name" content="خطتي">
+<meta name="theme-color" content="#17253A">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8EDF1; --surface:#F7F9FB; --ink:#17253A; --muted:#566A80; --line:#C9D3DD;
+  --study:#2E54A3; --study-soft:#DCE4F5;
+  --bike:#1D7652; --bike-soft:#D3EBE0;
+  --indoor:#A86E14; --indoor-soft:#F3E4CB;
+  --alert:#A53232; --alert-soft:#F5DCDC;
+  --empty:#D3DBE3; --on-accent:#FFFFFF;
+  --kufi:"Reem Kufi","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --sans:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1722; --surface:#162131; --ink:#E3EAF2; --muted:#94A4B8; --line:#2A3A4E;
+    --study:#86A5E6; --study-soft:#1D2C49;
+    --bike:#5FC69C; --bike-soft:#163A2D;
+    --indoor:#E5B062; --indoor-soft:#3A2D18;
+    --alert:#EC8080; --alert-soft:#402124;
+    --empty:#25344A; --on-accent:#0F1722;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1722; --surface:#162131; --ink:#E3EAF2; --muted:#94A4B8; --line:#2A3A4E;
+  --study:#86A5E6; --study-soft:#1D2C49;
+  --bike:#5FC69C; --bike-soft:#163A2D;
+  --indoor:#E5B062; --indoor-soft:#3A2D18;
+  --alert:#EC8080; --alert-soft:#402124;
+  --empty:#25344A; --on-accent:#0F1722;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.7}
+main{max-width:760px;margin:0 auto;padding:24px 18px 48px}
+h1,h2,h3{font-family:var(--kufi);font-weight:700;margin:0;line-height:1.3}
+h1{font-size:2.1rem}
+h2{font-size:1.25rem;margin-bottom:12px}
+p{margin:0}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--study);outline-offset:2px}
+.muted{color:var(--muted)}
+section{margin-top:28px}
+
+/* Header */
+.head-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.range{color:var(--muted);font-size:.95rem}
+.deadline{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--surface);border-inline-start:5px solid var(--alert)}
+.deadline strong{font-family:var(--kufi);font-size:1.15rem}
+.deadline .note{font-size:.85rem;color:var(--muted);margin-top:4px}
+
+/* Semester ribbon */
+.ribbon{display:grid;grid-template-columns:repeat(12,1fr);gap:5px;margin-top:18px}
+.seg{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0}
+.bar{position:relative;width:100%;height:46px;border-radius:6px;background:var(--empty);overflow:hidden}
+.bar .fill{position:absolute;inset-inline:0;bottom:0;background:var(--bike)}
+.bar.low .fill{background:var(--indoor)}
+.seg.current .bar{box-shadow:0 0 0 2px var(--ink)}
+.seg.viewing .num{font-weight:700;color:var(--ink)}
+.seg .num{font-family:var(--kufi);font-size:.85rem;color:var(--muted)}
+.ribbon-legend{font-size:.8rem;color:var(--muted);margin-top:6px}
+
+/* Meters */
+.meters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.meter{background:var(--surface);border-radius:10px;padding:12px 14px}
+.meter .label{font-size:.9rem;color:var(--muted)}
+.meter .val{font-family:var(--kufi);font-size:1.5rem}
+.pips{display:flex;gap:5px;margin-top:6px}
+.pip{flex:1;height:8px;border-radius:4px;background:var(--empty)}
+.m-study .pip.on{background:var(--study)}
+.m-bike .pip.on{background:var(--bike)}
+.m-indoor .pip.on{background:var(--indoor)}
+.m-sleep .val.bad{color:var(--alert)}
+
+/* Alerts */
+.alerts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.alert{background:var(--alert-soft);border-radius:8px;padding:10px 12px;font-size:.95rem}
+.alert.info{background:var(--surface);border-inline-start:4px solid var(--muted)}
+
+/* Week grid */
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.day.selected{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.day.today .dn::after{content:"";display:block;width:6px;height:6px;border-radius:50%;background:var(--alert);margin:2px auto 0}
+.day .dn{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.day .dd{font-family:var(--kufi);font-size:1.1rem}
+.chips{display:flex;flex-direction:column;gap:3px;width:100%;padding:0 4px}
+.chip{height:7px;border-radius:4px;border:1.5px solid currentColor;opacity:.9}
+.chip.study{color:var(--study)} .chip.bike{color:var(--bike)} .chip.indoor{color:var(--indoor)}
+.chip.done{background:currentColor}
+.chip.miss{border-style:dashed;opacity:.5}
+.day .flag{font-size:.68rem;color:var(--alert);white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:16px;height:7px;border-radius:4px}
+
+/* Day panel */
+.panel{background:var(--surface);border-radius:12px;padding:16px}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.item{border-inline-start:5px solid var(--line);padding:10px 12px;margin-top:10px;border-radius:6px;background:var(--bg)}
+.item.study{border-color:var(--study)}
+.item.bike{border-color:var(--bike)}
+.item.indoor{border-color:var(--indoor)}
+.item.sleep{border-color:var(--muted)}
+.item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.item h3{font-size:1.05rem}
+.item .sub{font-size:.88rem;color:var(--muted);margin-top:2px}
+.toggles{display:flex;gap:6px}
+.tg{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 14px;font-weight:500}
+.tg[aria-pressed="true"].yes{background:var(--bike);border-color:var(--bike);color:var(--on-accent)}
+.tg[aria-pressed="true"].no{background:var(--alert);border-color:var(--alert);color:var(--on-accent)}
+.sleep-inputs{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;align-items:flex-end}
+.sleep-inputs label{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:2px}
+input[type=time]{font-family:inherit;font-size:1rem;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.sleep-result{font-family:var(--kufi);font-size:1.2rem}
+.sleep-result.bad{color:var(--alert)} .sleep-result.good{color:var(--bike)}
+details{margin-top:8px;font-size:.9rem}
+summary{cursor:pointer;color:var(--muted)}
+.swap-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.swap-list button{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 10px}
+.warn{color:var(--alert);font-size:.88rem;margin-top:6px}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;padding:0;font-size:.85rem}
+.connect{background:var(--alert-soft);border-radius:10px;padding:12px 14px;margin-bottom:18px}
+.connect-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.connect input{flex:1;min-width:160px;font-family:inherit;font-size:1rem;padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+[hidden]{display:none !important}
+footer{margin-top:32px;font-size:.85rem;color:var(--muted)}
+footer .err{color:var(--alert)}
+@media (max-width:520px){
+  h1{font-size:1.7rem}
+  .ribbon{gap:3px}
+  .bar{height:38px}
+  .day .dn{font-size:.68rem}
+  .week{gap:4px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .bar .fill{transition:height .4s ease}
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="head-top">
+      <div>
+        <h1 id="weekTitle">الأسبوع</h1>
+        <p class="range" id="weekRange"></p>
+      </div>
+      <p class="muted" id="nowLine"></p>
+    </div>
+    <div class="deadline" id="deadline"></div>
+    <nav class="ribbon" id="ribbon" aria-label="أسابيع الفصل"></nav>
+    <p class="ribbon-legend">امتلاء كل أسبوع يعكس نسبة ما أنجزتَه من الدراسة والدراجة والرياضة الداخلية. اضغط على أي أسبوع لعرضه.</p>
+  </header>
+
+  <section aria-labelledby="mTitle">
+    <h2 id="mTitle">حصيلة الأسبوع</h2>
+    <div class="meters" id="meters"></div>
+    <div class="alerts" id="alerts"></div>
+  </section>
+
+  <section aria-labelledby="wTitle">
+    <h2 id="wTitle">أيام الأسبوع</h2>
+    <div class="week" id="week"></div>
+    <div class="legend">
+      <span><i style="background:var(--study)"></i>دراسة</span>
+      <span><i style="background:var(--bike)"></i>دراجة</span>
+      <span><i style="background:var(--indoor)"></i>رياضة داخلية</span>
+      <span>المعبّأ: تم، والمتقطع: لم يتم، والفارغ: لم يُسجَّل</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="dTitle">
+    <div class="panel" id="panel"></div>
+  </section>
+
+  <footer>
+    <p id="status">جارٍ التحميل…</p>
+    <p style="margin-top:6px">مواعيد التذكير في تقويم Google؛ هذه الصفحة للتسجيل والمتابعة ولا ترسل تنبيهات.</p>
+  </footer>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  // ================= الإعداد =================
+  // الصق هنا رابط خدمة Google المنتهي بكلمة exec بين علامتي التنصيص:
+  var API_URL = 'https://script.google.com/macros/s/AKfycby_kKpgaeBPvkx_a4a39tRCBtmETD6WdPU4a9FWswSBbmWO49hiX4wTihU5EMcgDYd7tw/exec';
+  // ==========================================
+  var OFFSET = 3 * 3600000;               // توقيت الرياض (UTC+3 بلا توقيت صيفي)
+  var DAY = 86400000;
+  var SEM_START = Date.UTC(2026, 8, 7);    // الاثنين 7 سبتمبر 2026
+  var WEEKS = 12;
+  var DAYNAMES = ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  var MONTHS = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  var TEMPLATE = {
+    1:{study:true,  act:"indoor"},
+    2:{study:false, act:"bike"},
+    3:{study:false, act:"indoor", light:true},
+    4:{study:true,  act:"indoor"},
+    5:{study:false, act:"bike"},
+    6:{study:true,  act:"indoor", closing:true},
+    0:{study:false, act:"bike", deadline:true}
+  };
+  var LS_KEY = "study-sport-tracker-days-v1";
+
+  var days = {};
+  try { days = JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}; } catch (e) { days = {}; }
+  var viewWeek = null, selected = null;
+
+  // ---------- أدوات التاريخ ----------
+  function nowShifted(){ return Date.now() + OFFSET; }
+  function keyOf(ms){ return new Date(ms).toISOString().slice(0,10); }
+  function msOf(k){ return Date.parse(k + "T00:00:00Z"); }
+  function todayKey(){ var d = new Date(nowShifted()); return keyOf(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
+  function dow(k){ return new Date(msOf(k)).getUTCDay(); }
+  function weekIdx(k){ return Math.floor((msOf(k) - SEM_START) / (7*DAY)); }
+  function clampW(w){ return Math.max(0, Math.min(WEEKS-1, w)); }
+  function weekDays(w){ var a=[]; for (var i=0;i<7;i++) a.push(keyOf(SEM_START + (w*7+i)*DAY)); return a; }
+  function addDays(k,n){ return keyOf(msOf(k) + n*DAY); }
+  function fmtDate(k){ var d=new Date(msOf(k)); return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()]; }
+  function toMin(t){ if(!t) return null; var p=t.split(":"); return (+p[0])*60 + (+p[1]); }
+  function fmtDur(min){ var h=Math.floor(min/60), m=min%60; return h + " س" + (m ? " و" + m + " د" : ""); }
+
+  function ar(n, one, two, few, many){
+    if (n === 1) return one;
+    if (n === 2) return two;
+    if (n >= 3 && n <= 10) return n + " " + few;
+    return n + " " + many;
+  }
+  function rec(k){ if(!days[k]) days[k] = {}; return days[k]; }
+  function planOf(k){
+    var t = TEMPLATE[dow(k)], r = days[k] || {};
+    var act = r.plan || t.act;
+    return { study:t.study, act:act, light:!!t.light && act==="indoor", closing:!!t.closing, deadline:!!t.deadline };
+  }
+  function sleepMin(k){
+    var r = days[k]; if(!r) return null;
+    var s = toMin(r.sleepStart), w = toMin(r.wake);
+    if (s===null || w===null) return null;
+    return ((w - s) % 1440 + 1440) % 1440;
+  }
+
+  // ---------- التخزين (جدول Google عبر Apps Script) ----------
+  var PENDING_KEY = "study-sport-tracker-pending";
+  function getPending(){ try { return JSON.parse(localStorage.getItem(PENDING_KEY) || "[]") || []; } catch(e){ return []; } }
+  function setPending(a){ try { localStorage.setItem(PENDING_KEY, JSON.stringify(a)); } catch(e){} }
+  function addPending(k){ var a = getPending(); if (a.indexOf(k) < 0) { a.push(k); setPending(a); } }
+  function dropPending(k){ setPending(getPending().filter(function(x){ return x !== k; })); }
+  function cacheLocal(){ try { localStorage.setItem(LS_KEY, JSON.stringify(days)); } catch(e){} }
+  function remoteOn(){ return !!API_URL; }
+
+  function postDay(k){
+    var body = JSON.stringify({ key:k, data:days[k] || {} });
+    return fetch(API_URL, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body:body })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if (j && j.ok) { dropPending(k); return true; }
+        throw new Error((j && j.error) || "failed");
+      });
+  }
+  var chain = Promise.resolve();
+  function save(k){
+    cacheLocal();
+    if (!remoteOn()) return;
+    addPending(k);
+    chain = chain.then(function(){ return postDay(k); }).then(function(){
+      markSynced();
+    }).catch(function(){
+      setStatus("تعذّر الوصول إلى خدمة Google. تسجيلاتك محفوظة في هذا المتصفح وستُرسل عند فتح الصفحة والاتصال متاح.", true);
+    });
+  }
+  function markSynced(){
+    var d = new Date(nowShifted());
+    var hh = String(d.getUTCHours()).padStart(2,"0"), mm = String(d.getUTCMinutes()).padStart(2,"0");
+    setStatus("سجلك محفوظ في جدول Google، وآخر مزامنة الساعة " + hh + ":" + mm + ".");
+  }
+  function setStatus(msg, isErr){
+    var el = document.getElementById("status");
+    el.textContent = msg;
+    el.className = isErr ? "err" : "";
+  }
+  var loading = false;
+  function load(){
+    if (!remoteOn() || loading) return;
+    loading = true;
+    setStatus("جارٍ المزامنة مع جدول Google…");
+    var pend = getPending();
+    var flush = pend.reduce(function(p,k){ return p.then(function(){ return postDay(k).catch(function(){}); }); }, Promise.resolve());
+    flush.then(function(){
+      return fetch(API_URL).then(function(r){ return r.json(); });
+    }).then(function(j){
+      if (!j || !j.ok) {
+        throw new Error("failed");
+      }
+      var remote = j.days || {};
+      var still = getPending();
+      if (!Object.keys(remote).length && Object.keys(days).length && !localStorage.getItem("study-sport-tracker-migrated")) {
+        try { localStorage.setItem("study-sport-tracker-migrated", "1"); } catch(e){}
+        Object.keys(days).forEach(save);
+        return;
+      }
+      still.forEach(function(k){ if (days[k]) remote[k] = days[k]; });
+      days = remote; cacheLocal(); render(); markSynced();
+      try { localStorage.setItem("study-sport-tracker-migrated", "1"); } catch(e){}
+    }).catch(function(){
+      setStatus("تعذّر الوصول إلى خدمة Google. تسجيلاتك محفوظة في هذا المتصفح وستُرسل عند عودة الاتصال.", true);
+    }).then(function(){ loading = false; });
+  }
+
+  // ---------- الحساب ----------
+  function weekStats(w){
+    var ds = weekDays(w), s=0, b=0, i=0, iTarget=0, sleepSum=0, sleepN=0;
+    ds.forEach(function(k){
+      var r = days[k] || {}, p = planOf(k);
+      if (r.study === true) s++;
+      if (r.bike === true) b++;
+      if (r.indoor === true) i++;
+      if (p.act === "indoor") iTarget++;
+      var sm = sleepMin(k); if (sm !== null) { sleepSum += sm; sleepN++; }
+    });
+    var sc = Math.min(s,3), bc = Math.min(b,3), ic = Math.min(i,iTarget);
+    return { study:s, bike:b, indoor:i, indoorTarget:iTarget,
+             ratio:(sc+bc+ic)/(3+3+iTarget),
+             sleepAvg: sleepN ? Math.round(sleepSum/sleepN) : null, sleepN:sleepN };
+  }
+
+  function swapCandidates(k){
+    var today = todayKey(), p = planOf(k), r = days[k] || {};
+    if (r[p.act] != null) return [];
+    var w = weekIdx(k);
+    return weekDays(w).filter(function(d){
+      if (d === k || d < today) return false;
+      var q = planOf(d);
+      if (q.act === p.act) return false;
+      return (days[d] || {})[q.act] == null;
+    });
+  }
+  function wouldBeAdjacent(a,b){
+    var pa = planOf(a).act, pb = planOf(b).act;
+    var map = {}; weekDays(weekIdx(a)).forEach(function(d){ map[d] = planOf(d).act; });
+    map[a] = pb; map[b] = pa;
+    var list = weekDays(weekIdx(a));
+    for (var i=1;i<list.length;i++) if (map[list[i]]==="bike" && map[list[i-1]]==="bike") return true;
+    return false;
+  }
+  function setPlan(d, act){
+    var r = rec(d);
+    if (act === TEMPLATE[dow(d)].act) delete r.plan; else r.plan = act;
+    save(d);
+  }
+  function doSwap(a,b){
+    var pa = planOf(a).act, pb = planOf(b).act;
+    setPlan(a, pb); setPlan(b, pa);
+    render();
+  }
+
+  function indoorSuggestion(k){
+    var prev = days[addDays(k,-1)] || {};
+    if (prev.bike === true) return "المقترح: 4 عصرًا، لأنك خرجت بالدراجة الليلة الماضية.";
+    var w = toMin((days[k]||{}).wake);
+    if (w === null) return "10 صباحًا أو 4 عصرًا بحسب نومك. سجّل وقت استيقاظك ليظهر المقترح.";
+    return w <= 510 ? "المقترح: 10 صباحًا، لأنك استيقظت مبكرًا." : "المقترح: 4 عصرًا، لأن استيقاظك كان متأخرًا.";
+  }
+
+  function alertsFor(w){
+    var out = [], today = todayKey();
+    if (w !== weekIdx(today)) return out;
+    var ds = weekDays(w), st = weekStats(w);
+    var rest = ds.filter(function(d){ return d >= today; });
+
+    var needBike = Math.max(0, 3 - st.bike);
+    var bikeAvail = rest.filter(function(d){ return planOf(d).act==="bike" && (days[d]||{}).bike !== false; }).length;
+    if (needBike > bikeAvail) out.push(["alert", "المتبقي في الخطة " + (bikeAvail ? ar(bikeAvail, "خرجة واحدة", "خرجتان", "خرجات", "خرجة") : "لا خرجات") + "، والمطلوب " + ar(needBike, "خرجة واحدة", "خرجتان", "خرجات", "خرجة") + " لبلوغ ثلاث خرجات. بدّل يومًا داخليًا بيوم دراجة من لوحة اليوم."]);
+
+    var needStudy = Math.max(0, 3 - st.study);
+    var studyAvail = rest.filter(function(d){ return d <= ds[5] && planOf(d).study && (days[d]||{}).study !== false; }).length;
+    if (needStudy > studyAvail) out.push(["alert", "المطلوب " + ar(needStudy, "جلسة دراسة واحدة", "جلستا دراسة", "جلسات دراسة", "جلسة") + "، والمتبقي في الخطة قبل مساء السبت " + (studyAvail ? ar(studyAvail, "جلسة واحدة", "جلستان", "جلسات", "جلسة") : "لا شيء") + ". إن كنت درست في يوم سابق فسجّله من شبكة الأيام، وإلا فسجّل جلسة إضافية في يوم غير مجدول."]);
+
+    var last = null;
+    Object.keys(days).forEach(function(d){ if (days[d].study === true && d <= today && (!last || d > last)) last = d; });
+    if (last) {
+      var gap = Math.round((msOf(today) - msOf(last)) / DAY);
+      if (gap > 3) out.push(["alert", "مضت " + ar(gap, "يوم", "يومان", "أيام", "يومًا") + " منذ آخر جلسة دراسة. القاعدة ألّا تزيد الفجوة على ثلاثة أيام."]);
+    }
+    var sm = sleepMin(today);
+    if (sm !== null && sm < 360) out.push(["alert", "نومك الليلة الماضية " + fmtDur(sm) + "، وهو أقل من الهدف (6 إلى 7 ساعات)."]);
+    if (planOf(today).light) out.push(["info", "الرياضة الداخلية اليوم خفيفة: إطالة ومرونة، لأن الأسبوع بلا يوم راحة كامل."]);
+    if (planOf(today).act === "bike") out.push(["info", "الليلة خرجة دراجة، ونافذة الانطلاق من 11 مساءً حتى 1 صباحًا."]);
+    return out;
+  }
+
+  // ---------- العرض ----------
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  function renderHeader(){
+    var today = todayKey(), tw = weekIdx(today), w = viewWeek;
+    var ds = weekDays(w);
+    document.getElementById("weekTitle").textContent = "الأسبوع " + (w+1) + " من " + WEEKS;
+    document.getElementById("weekRange").textContent = "من " + DAYNAMES[1] + " " + fmtDate(ds[0]) + " إلى " + DAYNAMES[0] + " " + fmtDate(ds[6]) + " 2026";
+    var nowL = "اليوم: " + DAYNAMES[dow(today)] + " " + fmtDate(today);
+    if (tw < 0) nowL += " (قبل بداية الفصل)";
+    if (tw >= WEEKS) nowL += " (انتهى الفصل)";
+    document.getElementById("nowLine").textContent = nowL;
+
+    var dl = document.getElementById("deadline");
+    var internal = SEM_START + (w*7 + 5)*DAY + 21*3600000;               // السبت 9 مساءً
+    var official = SEM_START + (w*7 + 7)*DAY + (w <= 6 ? 7*60+59 : 8*60+59)*60000; // الاثنين صباحًا بتوقيت الرياض
+    var now = nowShifted(), html;
+    function left(ms){ var m = Math.floor(ms/60000), d = Math.floor(m/1440), h = Math.floor((m%1440)/60);
+      var parts = [];
+      if (d) parts.push(ar(d, "يوم واحد", "يومان", "أيام", "يومًا"));
+      if (h || !d) parts.push(h === 0 ? "أقل من ساعة" : ar(h, "ساعة واحدة", "ساعتان", "ساعات", "ساعة"));
+      return parts.join(" و"); }
+    if (now < internal) html = "<strong>باقٍ " + left(internal-now) + " على الموعد الداخلي</strong><p>مساء السبت " + fmtDate(ds[5]) + " الساعة 9 م، بعد الجلسة الختامية.</p>";
+    else if (now < official) html = "<strong>انقضى الموعد الداخلي، والإغلاق الرسمي بعد " + left(official-now) + "</strong><p>يوم الأحد " + fmtDate(ds[6]) + " احتياط للتسليم فقط.</p>";
+    else html = "<strong>انتهى هذا الأسبوع الدراسي</strong><p>أُغلق في " + fmtDate(ds[6]) + ".</p>";
+    html += '<p class="note">الإغلاق الرسمي محسوب على أنه منتصف ليل الأحد بتوقيت وسط أمريكا، أي ' + (w <= 6 ? "7:59" : "8:59") + " صباح الاثنين بتوقيت السعودية. تحقق منه في خطة المقرر.</p>";
+    dl.innerHTML = html;
+
+    var rib = document.getElementById("ribbon"), out = "";
+    for (var i=0;i<WEEKS;i++){
+      var r = i <= tw ? weekStats(i).ratio : 0;
+      var pct = Math.round(r*100);
+      var cls = "seg" + (i===tw ? " current" : "") + (i===w ? " viewing" : "");
+      out += '<button class="' + cls + '" data-week="' + i + '" aria-label="الأسبوع ' + (i+1) + '، الإنجاز ' + pct + '٪"' + (i===w ? ' aria-current="true"' : "") + '>' +
+             '<span class="bar' + (i < tw && r < 0.7 ? " low" : "") + '"><span class="fill" style="height:' + pct + '%"></span></span>' +
+             '<span class="num">' + (i+1) + '</span></button>';
+    }
+    rib.innerHTML = out;
+  }
+
+  function pips(n, total){ var s=""; for (var i=0;i<total;i++) s += '<span class="pip' + (i<n ? " on" : "") + '"></span>'; return '<div class="pips">' + s + "</div>"; }
+
+  function renderMeters(){
+    var st = weekStats(viewWeek);
+    var sl = st.sleepAvg === null ? "—" : fmtDur(st.sleepAvg);
+    document.getElementById("meters").innerHTML =
+      '<div class="meter m-study"><p class="label">جلسات الدراسة</p><p class="val">' + st.study + " من 3</p>" + pips(st.study,3) + "</div>" +
+      '<div class="meter m-bike"><p class="label">خرجات الدراجة</p><p class="val">' + st.bike + " من 3</p>" + pips(st.bike,3) + "</div>" +
+      '<div class="meter m-indoor"><p class="label">الرياضة الداخلية</p><p class="val">' + st.indoor + " من " + st.indoorTarget + "</p>" + pips(st.indoor,st.indoorTarget) + "</div>" +
+      '<div class="meter m-sleep"><p class="label">متوسط النوم' + (st.sleepN ? " (" + ar(st.sleepN, "ليلة واحدة", "ليلتان", "ليالٍ", "ليلة") + ")" : "") + '</p><p class="val' + (st.sleepAvg!==null && st.sleepAvg<360 ? " bad" : "") + '">' + sl + '</p><p class="label">الهدف: 6 إلى 7 ساعات</p></div>';
+    var al = alertsFor(viewWeek);
+    document.getElementById("alerts").innerHTML = al.map(function(a){ return '<p class="alert' + (a[0]==="info" ? " info" : "") + '">' + esc(a[1]) + "</p>"; }).join("");
+  }
+
+  function chip(kind, val){ return '<span class="chip ' + kind + (val===true ? " done" : val===false ? " miss" : "") + '"></span>'; }
+
+  function renderWeek(){
+    var today = todayKey(), ds = weekDays(viewWeek), order = ds; // الاثنين أولًا
+    document.getElementById("week").innerHTML = order.map(function(k){
+      var p = planOf(k), r = days[k] || {};
+      var chips = "";
+      if (p.study || r.study != null) chips += chip("study", r.study);
+      chips += chip(p.act, r[p.act]);
+      var cls = "day" + (k===selected ? " selected" : "") + (k===today ? " today" : "");
+      return '<button class="' + cls + '" data-day="' + k + '" aria-pressed="' + (k===selected) + '" aria-label="' + DAYNAMES[dow(k)] + " " + fmtDate(k) + '">' +
+        '<span class="dn">' + DAYNAMES[dow(k)] + '</span><span class="dd">' + new Date(msOf(k)).getUTCDate() + '</span>' +
+        '<span class="chips">' + chips + "</span>" + (p.deadline ? '<span class="flag">نهاية الأسبوع</span>' : "") + "</button>";
+    }).join("");
+  }
+
+  function toggles(k, field, yes, no){
+    var v = (days[k] || {})[field];
+    return '<div class="toggles">' +
+      '<button class="tg yes" data-k="' + k + '" data-f="' + field + '" data-v="true" aria-pressed="' + (v===true) + '">' + yes + "</button>" +
+      '<button class="tg no" data-k="' + k + '" data-f="' + field + '" data-v="false" aria-pressed="' + (v===false) + '">' + no + "</button></div>";
+  }
+
+  function renderPanel(){
+    var k = selected, p = planOf(k), r = days[k] || {}, today = todayKey();
+    var rel = k===today ? "اليوم" : k===addDays(today,-1) ? "أمس" : k===addDays(today,1) ? "غدًا" : "";
+    var h = '<div class="panel-head"><h2 id="dTitle">' + (rel ? rel + ": " : "") + DAYNAMES[dow(k)] + " " + fmtDate(k) + "</h2>" +
+            '<button class="linkbtn" id="clearDay">مسح تسجيلات هذا اليوم</button></div>';
+
+    // النوم
+    var sm = sleepMin(k);
+    var sres = sm === null ? '<span class="sleep-result">—</span>' :
+      '<span class="sleep-result ' + (sm < 360 ? "bad" : sm <= 420 ? "good" : "") + '">' + fmtDur(sm) + "</span>";
+    var snote = sm === null ? "" : sm < 360 ? "أقل من الهدف." : sm <= 420 ? "ضمن الهدف." : "أكثر من الهدف.";
+    h += '<div class="item sleep"><div class="item-head"><div><h3>نوم الليلة السابقة</h3><p class="sub">الهدف 6 إلى 7 ساعات. يُحسب النوم لليوم الذي استيقظت فيه.</p></div>' + sres + "</div>" +
+         '<div class="sleep-inputs"><label>نمت الساعة<input type="time" id="sleepStart" value="' + esc(r.sleepStart||"") + '"></label>' +
+         '<label>استيقظت الساعة<input type="time" id="wake" value="' + esc(r.wake||"") + '"></label>' +
+         '<span class="muted" style="font-size:.88rem">' + snote + "</span></div></div>";
+
+    // الدراسة
+    if (p.study) {
+      var title = p.closing ? "الجلسة الختامية وتسليم الواجبات" : dow(k)===1 ? "جلسة دراسة: قراءة المتطلبات والبدء" : "جلسة دراسة: العمل الأساسي على الواجبات";
+      h += '<div class="item study"><div class="item-head"><div><h3>' + title + '</h3><p class="sub">6 مساءً إلى 9 مساءً (3 ساعات)</p></div>' + toggles(k,"study","أنجزت","لم أنجز") + "</div></div>";
+    } else {
+      var ex = r.study === true;
+      h += '<div class="item study"><div class="item-head"><div><h3>جلسة دراسة إضافية</h3><p class="sub">غير مجدولة لهذا اليوم. سجّلها إن درست لتُحتسب ضمن الأسبوع.</p></div>' +
+           '<div class="toggles"><button class="tg yes" data-k="' + k + '" data-f="study" data-v="' + (ex ? "clear" : "true") + '" aria-pressed="' + ex + '">' + (ex ? "مسجّلة" : "سجّل جلسة") + "</button></div></div></div>";
+    }
+
+    // الرياضة
+    var cands = swapCandidates(k), swapHtml = "";
+    if (cands.length) {
+      swapHtml = '<details' + (p.act==="bike" && sm!==null && sm<360 ? " open" : "") + '><summary>' + (p.act==="bike" ? "نقل الخرجة إلى يوم آخر في هذا الأسبوع" : "جعل هذا اليوم يوم دراجة بدلًا من يوم آخر") + "</summary>" +
+        '<div class="swap-list">' + cands.map(function(d){
+          return '<button data-swap="' + d + '">' + DAYNAMES[dow(d)] + " " + fmtDate(d) + (wouldBeAdjacent(k,d) ? " (ينتج عنه خرجتان متتاليتان)" : "") + "</button>";
+        }).join("") + "</div></details>";
+    }
+    if (p.act === "bike") {
+      h += '<div class="item bike"><div class="item-head"><div><h3>خرجة الدراجة' + (r.plan ? " (منقولة)" : "") + '</h3><p class="sub">نافذة الانطلاق من 11 مساءً حتى 1 صباحًا. سجّل بعد العودة.</p></div>' + toggles(k,"bike","خرجت","لم أخرج") + "</div>" +
+           (sm !== null && sm < 360 && r.bike == null ? '<p class="warn">نومك أقل من ست ساعات. إن رأيت تأجيل الخرجة فانقلها إلى يوم آخر.</p>' : "") + swapHtml + "</div>";
+    } else {
+      h += '<div class="item indoor"><div class="item-head"><div><h3>الرياضة الداخلية' + (p.light ? " (جلسة خفيفة)" : "") + (r.plan ? " (بدلًا من الدراجة)" : "") + '</h3><p class="sub">ساعة واحدة. ' + indoorSuggestion(k) + "</p></div>" + toggles(k,"indoor","أنجزت","لم أنجز") + "</div>" + swapHtml + "</div>";
+    }
+    document.getElementById("panel").innerHTML = h;
+  }
+
+  function render(){ renderHeader(); renderMeters(); renderWeek(); renderPanel(); }
+
+  // ---------- التفاعل ----------
+  document.addEventListener("click", function(e){
+    var t = e.target.closest("button"); if (!t) return;
+    if (t.dataset.week != null) {
+      viewWeek = +t.dataset.week;
+      var today = todayKey();
+      selected = weekIdx(today) === viewWeek ? today : weekDays(viewWeek)[0];
+      render(); return;
+    }
+    if (t.dataset.day) { selected = t.dataset.day; render(); return; }
+    if (t.dataset.f) {
+      var r = rec(t.dataset.k), f = t.dataset.f, v = t.dataset.v;
+      if (v === "clear") delete r[f];
+      else { var val = v === "true"; if (r[f] === val) delete r[f]; else r[f] = val; }
+      save(t.dataset.k); render(); return;
+    }
+    if (t.dataset.swap) { doSwap(selected, t.dataset.swap); return; }
+    if (t.id === "clearDay") {
+      if (confirm("مسح كل تسجيلات هذا اليوم (الدراسة والرياضة والنوم وأي نقل للخرجة)؟")) {
+        days[selected] = {}; save(selected); render();
+      }
+    }
+  });
+  document.addEventListener("change", function(e){
+    if (e.target.id === "sleepStart" || e.target.id === "wake") {
+      var r = rec(selected);
+      if (e.target.value) r[e.target.id] = e.target.value; else delete r[e.target.id];
+      save(selected); render();
+    }
+  });
+
+  // ---------- التشغيل ----------
+  (function init(){
+    var today = todayKey();
+    viewWeek = clampW(weekIdx(today));
+    selected = weekIdx(today) === viewWeek ? today : weekDays(viewWeek)[0];
+    render();
+    setInterval(function(){ renderHeader(); }, 60000);
+  })();
+
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") load(); });
+
+  if (!API_URL) setStatus("سجلك محفوظ في هذا المتصفح فقط، لأن رابط خدمة Google لم يُضبط بعد في الصفحة.", true);
+  else load();
+})();
+</script>
+</body>
+</html>
